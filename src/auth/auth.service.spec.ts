@@ -15,6 +15,7 @@ describe('AuthService', () => {
           useValue: {
             user: {
               upsert: jest.fn(),
+              create: jest.fn(),
               findUnique: jest.fn(),
               update: jest.fn(),
             },
@@ -34,10 +35,8 @@ describe('AuthService', () => {
     const token = await service.generateToken(email);
 
     expect(token).toBeDefined();
-    expect(prisma.user.upsert).toHaveBeenCalledWith({
-      where: { email },
-      update: { token },
-      create: { email, token },
+    expect(prisma.user.create).toHaveBeenCalledWith({
+      data: { email, token },
     });
   });
 
