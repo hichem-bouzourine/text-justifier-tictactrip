@@ -6,6 +6,7 @@ import * as crypto from 'crypto';
 export class AuthService {
     constructor(private prisma: PrismaService) { }
 
+    // Générer un token pour l'utilisateur
     async generateToken(email: string): Promise<string> {
         const token = crypto.randomBytes(20).toString('hex');
 
@@ -19,11 +20,13 @@ export class AuthService {
         return token;
     }
 
+    // Valider un token en cherchant l'utilisateur correspondant puis retournant un booléen
     async validateToken(token: string): Promise<boolean> {
         const user = await this.prisma.user.findUnique({ where: { token } });
         return !!user;
     }
 
+    // Incrémenter le compteur de mots de l'utilisateur
     async incrementWordCount(token: string, wordCount: number): Promise<void> {
         const user = await this.prisma.user.findUnique({ where: { token } });
 
