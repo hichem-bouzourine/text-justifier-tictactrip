@@ -8,16 +8,18 @@ export class AuthService {
 
     // Générer un token pour l'utilisateur
     async generateToken(email: string): Promise<string> {
-        const token = crypto.randomBytes(20).toString('hex');
+        const user = await this.prisma.user.findUnique({ where: { email } });
 
-        // Créer ou mettre à jour l'utilisateur
-        await this.prisma.user.upsert({
-            where: { email },
-            update: { token },
-            create: { email, token },
-        });
+        if (!user) {
+            const token = crypto.randomBytes(20).toString('hex');
 
-        return token;
+            // Créer un nouvel utilisateur
+            await this.prisma.user.create({ data: { email, token } });
+            return token;
+        } else {
+            // retourner le token existant
+            return user.token;
+        }
     }
 
     // Valider un token en cherchant l'utilisateur correspondant puis retournant un booléen
