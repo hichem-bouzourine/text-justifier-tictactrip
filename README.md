@@ -1,73 +1,162 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# **Text Justification API**
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project is a RESTful API built with **NestJS** and **TypeScript** that justifies a given text to fit lines of 80 characters. The API also implements authentication through unique tokens and rate limiting to ensure fair use. This project leverages **PostgreSQL** with **Prisma ORM** for token management.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## **Table of Contents**
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [API Documentation](#api-documentation)
+   - [Get Token](#1-get-token)
+   - [Justify Text](#2-justify-text)
+4. [Rate Limiting](#rate-limiting)
+5. [Installation](#installation)
+6. [Running the Project](#running-the-project)
+7. [Testing](#testing)
+8. [Project Structure](#project-structure)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Installation
+## **Features**
+
+- **Text Justification**: Adjusts text to have lines of exactly 80 characters.
+- **Authentication**: A unique token-based system for access control.
+- **Rate Limiting**: Limits token usage to 80,000 words justified per day.
+- **Persistent Data**: Uses **PostgreSQL** to store token information via **Prisma ORM**.
+
+---
+
+## **Tech Stack**
+
+- **Backend**: [NestJS](https://nestjs.com/), [TypeScript](https://www.typescriptlang.org/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Testing**: [Jest](https://jestjs.io/)
+
+---
+
+## **API Documentation**
+
+### **1. Get Token**
+
+**Endpoint**: `POST /api/token`
+
+This endpoint generates a unique token for an email address. The token is required for further API requests.
+
+- **Request**:
+  - **Method**: `POST`
+  - **Body** (JSON):
+    ```json
+    {
+      "email": "foo@bar.com"
+    }
+    ```
+
+- **Response**:
+  - **Status**: `200 OK`
+  - **Body** (JSON):
+    ```json
+    {
+      "token": "generated-unique-token"
+    }
+    ```
+- **Error Responses**:
+  - **Status**: `401 Unauthorized`
+    - invalid Email.
+
+### **2. Justify Text**
+
+**Endpoint**: `POST /api/justify`
+
+This endpoint justifies a block of text to ensure each line is exactly 80 characters long.
+
+- **Request**:
+  - **Method**: `POST`
+  - **Headers**:
+    ```
+    Authorization: <token>
+    ```
+  - **Body** (**text/plain**): Raw text input to be justified.
+
+- **Response**:
+  - **Status**: `200 OK` (if text is justified)
+  - **Body** (text/plain): Justified text output, where each line has a length of 80 characters.
+
+- **Error Responses**:
+  - **Status**: `401 Unauthorized`
+    - Returned if the token is missing or invalid.
+  - **Status**: `402 Payment Required`
+    - Returned if the user exceeds the daily limit of 80,000 words.
+
+---
+
+## **Rate Limiting**
+
+Each token is restricted to justify up to 80,000 words per day. If the limit is exceeded, the user will receive a `402 Payment Required` response.
+
+---
+
+## **Installation**
+
+### **1. Clone the repository**
 
 ```bash
-$ npm install
+git clone https://github.com/your-username/text-justification-api.git
+cd text-justification-api
 ```
 
-## Running the app
-
+### **2. Install Dependencies**
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Test
 
+### **3. Configure environment variables**
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+DATABASE_URL="Database url"
 ```
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### **4. Run database migrations**
+```bash
+npx prisma migrate dev --name init
+```
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### **5. Run the server**
+```bash
+npm run start
+```
+By default, the server runs on http://localhost:3000.
 
-## License
+### **6. API Testing**
+Once the server is running, you can use tools like Postman or curl to interact with the API.
+Example request for `/api/token`:
+```bash
+curl -X POST http://localhost:3000/api/token
+-H "Content-Type: application/json"
+-d '{"email": "foo@bar.com"}'
+``` 
 
-Nest is [MIT licensed](LICENSE).
+Example request for `/api/justify`:
+```bash
+curl -X POST http://localhost:3000/api/justify
+-H "Authorization: <token>"
+-H "Content-Type: text/plain"
+--data-binary @your-text-file.txt
+```
+
+### **7. Testing**
+
+To ensure code quality and functionality, the project includes unit and integration tests using Jest.
+
+**Run tests**
+```bash
+npm run test
+```
+**Run tests with coverage**
+```bash
+npm run test:cov
+```
+A detailed coverage report will be generated in the coverage/ folder.
