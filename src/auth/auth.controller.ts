@@ -12,6 +12,10 @@ export class AuthController {
             throw new UnauthorizedException('Email is required');
         }
 
+        if (!this.authService.validEmail(body.email)) {
+            throw new UnauthorizedException('Email is invalid');
+        }
+
         const token = await this.authService.generateToken(body.email);
         return { token };
     }

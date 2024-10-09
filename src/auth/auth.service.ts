@@ -56,4 +56,9 @@ export class AuthService {
         const user = await this.prisma.user.findUnique({ where: { token } });
         return user.wordCount;
     }
+
+    // regex to valid an email
+    validEmail(email: string) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
 }
